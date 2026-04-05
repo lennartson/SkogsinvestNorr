@@ -1,65 +1,136 @@
-import Image from "next/image";
+'use client'
+
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import HeroSection from '@/components/HeroSection'
+import PropertyCard from '@/components/PropertyCard'
+import { supabase, Property } from '@/lib/supabase'
+import { ChevronRight, TreePine, Users, Globe } from 'lucide-react'
 
 export default function Home() {
+  const [properties, setProperties] = useState<Property[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      const { data } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('status', 'active')
+        .limit(3)
+
+      if (data) setProperties(data)
+      setLoading(false)
+    }
+
+    fetchProperties()
+  }, [])
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <>
+      {/* Hero Section */}
+      <HeroSection />
+
+      {/* Statistics */}
+      <section className="bg-white py-12 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <TreePine size={40} className="mx-auto text-[#1a3a2a] mb-4" />
+              <p className="text-3xl font-bold text-[#1a3a2a]">30+</p>
+              <p className="text-gray-600">fastigheter förmedlade</p>
+            </div>
+            <div>
+              <Globe size={40} className="mx-auto text-[#1a3a2a] mb-4" />
+              <p className="text-3xl font-bold text-[#1a3a2a]">Norrland</p>
+              <p className="text-gray-600">från kust till inland</p>
+            </div>
+            <div>
+              <Users size={40} className="mx-auto text-[#1a3a2a] mb-4" />
+              <p className="text-3xl font-bold text-[#1a3a2a]">30 år</p>
+              <p className="text-gray-600">erfarenhet och passion</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Anders */}
+      <section className="py-16 bg-[#f9f6f0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            {/* Placeholder for photo */}
+            <div className="bg-gradient-to-br from-[#2a5a3a] to-[#1a3a2a] h-96 rounded-lg flex items-center justify-center">
+              <div className="text-white text-center">
+                <Users size={64} className="mx-auto mb-4 opacity-40" />
+                <p className="text-sm opacity-70">Porträttfoto av Anders</p>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-4xl font-bold text-[#1a3a2a] mb-6">
+                Om Anders
+              </h2>
+              <p className="text-gray-700 text-lg mb-4 leading-relaxed">
+                Jag är en mäklare med djup känsla för skog och norrländsk natur. Under över 30 år har jag arbetat med skogsfastigheter i Västerbotten och Västernorrland, och jag älskar det jag gör.
+              </p>
+              <p className="text-gray-700 text-lg mb-4 leading-relaxed">
+                Mina kunder ser mig inte bara som en mäklare utan som en rådgivare som verkligen förstår vad det innebär att äga en skogsfastighet. Jag hjälper både köpare och säljare att göra de bästa besluten.
+              </p>
+              <p className="text-gray-700 text-lg leading-relaxed">
+                Låt mig hjälpa dig med dina skogsfastighetsbehov — oavsett om du vill köpa, sälja eller bara få bättre insikt i vad du äger.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Current Properties */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl font-bold text-[#1a3a2a] mb-4">Aktuella fastigheter</h2>
+          <p className="text-gray-600 mb-12">Utvalda skogsfastigheter tillgängliga just nu</p>
+
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Laddar...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              {properties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          )}
+
+          <div className="text-center">
+            <Link
+              href="/till-salu"
+              className="inline-flex items-center gap-2 bg-[#1a3a2a] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#0f2415] transition"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              Se alla fastigheter
+              <ChevronRight size={20} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-[#1a3a2a] text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold mb-6">
+            Vill du köpa eller sälja en skogsfastighet?
+          </h2>
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Kontakta mig för ett kostnadsfritt samtal om dina möjligheter
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/kontakt"
+            className="inline-block bg-[#c9b48a] text-[#1a3a2a] px-8 py-3 rounded-lg font-bold hover:bg-[#d4c4a0] transition"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Kontakta Anders nu
+          </Link>
         </div>
-      </main>
-    </div>
-  );
+      </section>
+    </>
+  )
 }
